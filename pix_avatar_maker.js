@@ -2,50 +2,73 @@
  * Pixel Avatar Maker: front end code
  * written by Kevin Yang
  */
-
+window.onfocus = function(){console.log("hi")}
  var createGrid = function(grdSize){
     var mousedown = false;
     // Creates new DIV
-    var createDiv = function(sqsz){
-        var newDiv = document.createElement("div");
+    var createTd = function(width, height){
         var active = false;
         var select = false;
-        newDiv.className = "meow";
-        newDiv.style.width = "50px";
-        newDiv.style.height = "50px";
-        newDiv.style.position.left = "-1px";
-        newDiv.style.border = "1px red solid";
-        // show option of materials when double click
-        newDiv.onmouseenter = function(){
-            if(active == false){
-                select = true;
-                drawPix(this, true, "red")};
-        }
-        newDiv.onmouseout = function(){
+        var newTd = document.createElement("td");
+        newTd.style.width = width;
+        newTd.style.height = height;
+        newTd.style.position.left = "-1px";
+        newTd.style.border = "1px red solid";
+        newTd.onmouseenter = function(){
             if(active == false){
                 if(mousedown == true){
+                    active = true;
                     drawPix(this, true, "blue");
                 }
                 else{
+                    select = true;
+                    drawPix(this, true, "red")};
+                }
+        }
+        newTd.onmouseout = function(){
+            if(active == false){
+                /*
+                if(mousedown == true){
+                    active = true;
+                    drawPix(this, true, "blue");
+                }*/
+                //else{
                     select = false;
                     drawPix(this, false);
-                }
+                //}
             }
         }
-        newDiv.onmousedown = function(){
+        newTd.onmousedown = function(){
             this.style.backgroundColor = "yellow";
             active = true;
             mousedown = true;
         }
-        newDiv.onmouseup = function(){
-            this.style.backgroundColor = "green";
+        /*
+        document.body.onmouseup = function(){
             mousedown = false;
         }
-        newDiv.ondblclick = function(){
+        document.getElementById("parDiv").onmouseout = function(){
+            mousedown = false;
+        }*/
+        newTd.onmouseup = function(){
+            //mousedown = false;
+            this.style.backgroundColor = "green";
+        }
+        newTd.ondblclick = function(){
             this.style.backgroundColor = "grey";
             active = false;
         }
-        return newDiv;
+        return newTd;
+    }
+    var createTr = function(sqsz){
+        var newTr = document.createElement("tr");
+        newTr.className = "row";
+
+        for(var j = 0; j < sqsz; j++){
+        // show option of materials when double click
+            newTr.appendChild(createTd("50px", "50px"));
+        }
+        return newTr;
     }
 
     var drawPix = function(that, isActive, color){
@@ -56,13 +79,20 @@
     }
     
     var populateGrid = function(grdsz){
-        var parentDiv = document.createElement("div");
+        var parentDiv = document.createElement("table");
         parentDiv.style.width = 52*grdsz + 11 + "px";
         parentDiv.style.height = 52*grdsz+ 11 + "px";
         parentDiv.style.border = "1px green solid";
-        for(var i = 0; i < grdsz*grdsz; i++){
-            parentDiv.appendChild(createDiv());
+        parentDiv.id = "parDiv";
+        for(var i = 0; i < grdsz; i++){
+            parentDiv.appendChild(createTr(grdsz));
         }
+        parentDiv.onmouseup = function(){
+            mousedown = false;
+        }/*
+        parentDiv.onmouseout = function(){
+            mousedown = false;
+        }*/
         return parentDiv;
     }
     // Populate parent div to form grid
