@@ -79,6 +79,7 @@ window.onfocus = function(){console.log("hi")}
             that.style.backgroundColor = "white";
     }
     
+    // Populate the grid and do stuff within the grid
     var populateGrid = function(grdsz){
         var parentDiv = document.createElement("table");
         parentDiv.style.width = 52*grdsz + 11 + "px";
@@ -88,6 +89,18 @@ window.onfocus = function(){console.log("hi")}
         for(var i = 0; i < grdsz; i++){
             parentDiv.appendChild(createTr(grdsz));
         }
+        //console.log(parentDiv.rows[0].cells[0]);
+        var time = 1000;
+        for(var i = 0, row; row = parentDiv.rows[i]; i++){
+            for(var j = 0, col; col = row.cells[j]; j++){
+                //var col = row.cells[0];
+                // Sends copy of col to anonymous func to setTimeout.
+                // Without this, each setTimeout function will not have individual var access
+                (function(c, t){setTimeout(function(){c.style.backgroundColor = "purple"},t);})(col, time);
+                time = time + 200;
+            }
+        }
+        // Makes sure with the mouse is up, stop drawing.
         parentDiv.onmouseup = function(){
             mousedown = false;
         }/*
