@@ -1,5 +1,5 @@
 /*
- * Pixel Avatar Maker: front end code
+ * Pixel Zombie Fort: front end code
  * written by Kevin Yang
  */
 window.onfocus = function(){console.log("hi")}
@@ -14,7 +14,7 @@ window.onfocus = function(){console.log("hi")}
         newTd.style.height = height;
         newTd.style.position.left = "-1px";
         newTd.style.border = "1px red solid";
-        newTd.onmouseenter = function(){
+        newTd.onmouseover = function(){
             if(active == false){
                 if(mousedown == true){
                     active = true;
@@ -38,6 +38,7 @@ window.onfocus = function(){console.log("hi")}
                 //}
             }
         }
+        //mousedown in chrome cancels all other listeners
         newTd.onmousedown = function(){
             this.style.backgroundColor = "yellow";
             active = true;
