@@ -114,6 +114,17 @@ window.onfocus = function(){console.log("hi")}
         var start = new Date().getMilliseconds();
         var end;
         var diff = 0;
+
+        // If doing ++row or ++column in recursion, js seems to create local
+        // and skip on square ahead. Pass in row/ column by doing like row + 1
+        /* One not so elegant solution to it skipping over one square is:
+         * Use a --row when accessing array, the ++row in recursive return parameter.
+         * Kinda like this:
+         *  setTimeout(function(){
+            parentDiv.rows[--row].cells[--column].style.backgroundColor = "purple";
+            }, time + 100);
+            return animateGrid(++row, ++column, time + 100, direction, steps);
+        */
         var animateGrid = function(row, column, time, direction, steps){
             //console.log(steps + " " + column);
             if(row < 0 || row == parentDiv.rows.length){
@@ -122,7 +133,7 @@ window.onfocus = function(){console.log("hi")}
                 diff = end - start;
                 return;
             }
-            else if(column == steps - 1){
+            else if((column || row) == steps){
                 return;
             }
             else if(column == parentDiv.rows[row].cells.length - 1){
@@ -144,27 +155,28 @@ window.onfocus = function(){console.log("hi")}
                 }
                 else if(direction == 1){
                     setTimeout(function(){
-                    parentDiv.rows[row].cells[--column].style.backgroundColor = "purple";
+                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
                     }, time + 100);
-                    return animateGrid(row, ++column, time + 100, direction, steps);
+                    //++column;
+                    return animateGrid(row, column + 1, time + 100, direction, steps);
                 }
                 else if(direction == 2){
                     setTimeout(function(){
-                    parentDiv.rows[--row].cells[column].style.backgroundColor = "purple";
+                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
                     }, time + 100);
-                    return animateGrid(++row, ++column, time + 100, direction, steps);
+                    return animateGrid(row + 1, column + 1, time + 100, direction, steps);
                 }
                 else{
                     setTimeout(function(){
                     parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
                     }, time + 100);
-                    return animateGrid(row, ++column, time + 100, direction, steps);
+                    return animateGrid(row + 1, column, time + 100, direction, steps);
                 }
             }
         }
 
-        // 4th parameter: true for diagaonal, false for straight
-        animateGrid(0,0, 0, 1, 3);
+        // 4th parameter 0 1 2 3 (up, left, right, down)
+        animateGrid(0,0, 0, 3, 3);
         //animateGrid(0,-1, 0, false, 5);
         // Makes sure with the mouse is up, stop drawing.
         parentDiv.onmouseup = function(){
