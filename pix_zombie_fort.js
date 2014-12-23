@@ -91,15 +91,47 @@ window.onfocus = function(){console.log("hi")}
         }
         //console.log(parentDiv.rows[0].cells[0]);
         var time = 1000;
+        /*
+        var start = new Date().getTime();
+        var end;
         for(var i = 0, row; row = parentDiv.rows[i]; i++){
             for(var j = 0, col; col = row.cells[j]; j++){
                 //var col = row.cells[0];
                 // Sends copy of col to anonymous func to setTimeout.
                 // Without this, each setTimeout function will not have individual var access
                 (function(c, t){setTimeout(function(){c.style.backgroundColor = "purple"},t);})(col, time);
+
+                // Time is adding by a constant to set speed. Multiplying will have a parabolic speed upwards.
                 time = time + 200;
             }
         }
+        end = new Date().getTime();
+        console.log(end - start);
+    */
+
+        // Recursive solution to animating through a grid.
+        // Moves diagnally. Iterative might be better.
+        var start = new Date().getMilliseconds();
+        var end;
+        var diff = 0;
+        var animateGrid = function(row, column, time, diag){
+            if(row == parentDiv.rows.length){
+                end = new Date().getMilliseconds();
+                diff = end - start;
+                console.log(diff);
+                return;
+            }
+            else if(column == parentDiv.rows[row].cells.length - 1){
+                return animateGrid(++row, -1, time);
+            }
+            else{
+                setTimeout(function(){
+                    parentDiv.rows[--row].cells[column].style.backgroundColor = "purple";
+                }, time + 100);
+                return animateGrid(++row, ++column, time + 100);
+            }
+        }
+        animateGrid(0,-1, 0, 0);
         // Makes sure with the mouse is up, stop drawing.
         parentDiv.onmouseup = function(){
             mousedown = false;
