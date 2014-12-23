@@ -2,7 +2,7 @@
  * Pixel Zombie Fort: front end code
  * written by Kevin Yang
  */
-window.onfocus = function(){console.log("hi")}
+//window.onfocus = function(){console.log("hi")}
  var createGrid = function(grdSize){
     var mousedown = false;
     // Creates new DIV
@@ -44,13 +44,6 @@ window.onfocus = function(){console.log("hi")}
             active = true;
             mousedown = true;
         }
-        /*
-        document.body.onmouseup = function(){
-            mousedown = false;
-        }
-        document.getElementById("parDiv").onmouseout = function(){
-            mousedown = false;
-        }*/
         newTd.onmouseup = function(){
             //mousedown = false;
             this.style.backgroundColor = "green";
@@ -125,58 +118,81 @@ window.onfocus = function(){console.log("hi")}
             }, time + 100);
             return animateGrid(++row, ++column, time + 100, direction, steps);
         */
-        var animateGrid = function(row, column, time, direction, steps){
-            //console.log(steps + " " + column);
-            if(row < 0 || row == parentDiv.rows.length){
-                                        //console.log(row);
-                end = new Date().getMilliseconds();
-                diff = end - start;
-                return;
+        // Zombie object for health, position, view and death
+        var Zombie = function(type, row, column){
+            this.health;
+            this.row = row;
+            this.column = column;
+            this.view = {
+                "left": undefined,
+                "front" : undefined,
+                "right" : undefined,
+            };
+            if(type == "easy"){
+                this.health = 1;
             }
-            else if((column || row) == steps){
-                return;
+            else if (type == "normal"){
+                this.health = 2;
+            }
+            else if(type == "hard"){
+                this.health = 3;
+            }
+        }
+
+        var zombie = new Zombie("easy", 0, 0);
+
+        var animateGrid = function(row, column, time, direction, steps, cursteps){
+            if(row < 0){
+                //end = new Date().getMilliseconds();
+                //diff = end - start;
+                return parentDiv.rows[row + 1].cells[column];
+            }
+            else if(row == parentDiv.rows.length){
+                //end = new Date().getMilliseconds();
+                //diff = end - start;
+                return parentDiv.rows[row - 1].cells[column];
+            }
+            else if(cursteps == steps){
+                if(row == 0)
+                    return parentDiv.rows[row].cells[column - 1];
+                else if(column == 0)
+                    return parentDiv.rows[row - 1].cells[column];
+                else
+                    return parentDiv.rows[row - 1].cells[column - 1];
             }
             else if(column == parentDiv.rows[row].cells.length - 1){
                 return animateGrid(++row, -1, time, direction, steps);
             }
             else{
+                setTimeout(function(){
+                        parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
+                        zombie.row = row;
+                        zombie.column = column;
+                        console.log(zombie);
+                }, time + 100);
                 if(direction == 0 && row >= 0){
-                    setTimeout(function(){
-                        console.log(row);
-                        row = row + 1;
-                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
-                    }, time + 100);
-                    row = row - 1;
-                    if(row < 0){
+                    if(row - 1 < 0){
                         console.log("Cannot move more up!!!");
                     }
-                    console.log(row);
-                    return animateGrid(row, column, time + 100, direction, steps);
+                    return animateGrid(row - 1, column, time + 100, direction, steps, ++cursteps);
                 }
                 else if(direction == 1){
-                    setTimeout(function(){
-                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
-                    }, time + 100);
-                    //++column;
-                    return animateGrid(row, column + 1, time + 100, direction, steps);
+                    return animateGrid(row, column + 1, time + 100, direction, steps, ++cursteps);
                 }
                 else if(direction == 2){
-                    setTimeout(function(){
-                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
-                    }, time + 100);
-                    return animateGrid(row + 1, column + 1, time + 100, direction, steps);
+                    return animateGrid(row + 1, column + 1, time + 100, direction, steps, ++cursteps);
                 }
                 else{
-                    setTimeout(function(){
-                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
-                    }, time + 100);
-                    return animateGrid(row + 1, column, time + 100, direction, steps);
+                    return animateGrid(row + 1, column, time + 100, direction, steps, ++cursteps);
                 }
             }
         }
 
         // 4th parameter 0 1 2 3 (up, left, right, down)
-        animateGrid(0,0, 0, 3, 3);
+        zombie.row = 1;
+        zombie.column = 1;
+        var test = animateGrid(zombie.row,zombie.column,0,3,3,0);
+        console.log(test);
         //animateGrid(0,-1, 0, false, 5);
         // Makes sure with the mouse is up, stop drawing.
         parentDiv.onmouseup = function(){
