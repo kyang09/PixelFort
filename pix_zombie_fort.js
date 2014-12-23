@@ -114,24 +114,37 @@ window.onfocus = function(){console.log("hi")}
         var start = new Date().getMilliseconds();
         var end;
         var diff = 0;
-        var animateGrid = function(row, column, time, diag){
+        var animateGrid = function(row, column, time, diag, steps){
+            console.log(steps + " " + column);
             if(row == parentDiv.rows.length){
                 end = new Date().getMilliseconds();
                 diff = end - start;
-                console.log(diff);
+                return;
+            }
+            else if(column == steps - 1){
                 return;
             }
             else if(column == parentDiv.rows[row].cells.length - 1){
-                return animateGrid(++row, -1, time);
+                return animateGrid(++row, -1, time, diag, steps);
             }
             else{
-                setTimeout(function(){
+                if(diag == true){
+                    setTimeout(function(){
                     parentDiv.rows[--row].cells[column].style.backgroundColor = "purple";
-                }, time + 100);
-                return animateGrid(++row, ++column, time + 100);
+                    }, time + 100);
+                    return animateGrid(++row, ++column, time + 100, diag, steps);
+                }
+                else{
+                    setTimeout(function(){
+                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
+                    }, time + 100);
+                    return animateGrid(row, ++column, time + 100, diag, steps);
+                }
             }
         }
-        animateGrid(0,-1, 0, 0);
+
+        // 4th parameter: true for diagaonal, false for straight
+        animateGrid(0,-1, 0, true, 3);
         // Makes sure with the mouse is up, stop drawing.
         parentDiv.onmouseup = function(){
             mousedown = false;
