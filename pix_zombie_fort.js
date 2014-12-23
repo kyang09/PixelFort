@@ -114,9 +114,10 @@ window.onfocus = function(){console.log("hi")}
         var start = new Date().getMilliseconds();
         var end;
         var diff = 0;
-        var animateGrid = function(row, column, time, diag, steps){
-            console.log(steps + " " + column);
-            if(row == parentDiv.rows.length){
+        var animateGrid = function(row, column, time, direction, steps){
+            //console.log(steps + " " + column);
+            if(row < 0 || row == parentDiv.rows.length){
+                                        //console.log(row);
                 end = new Date().getMilliseconds();
                 diff = end - start;
                 return;
@@ -125,26 +126,46 @@ window.onfocus = function(){console.log("hi")}
                 return;
             }
             else if(column == parentDiv.rows[row].cells.length - 1){
-                return animateGrid(++row, -1, time, diag, steps);
+                return animateGrid(++row, -1, time, direction, steps);
             }
             else{
-                if(diag == true){
+                if(direction == 0 && row >= 0){
+                    setTimeout(function(){
+                        console.log(row);
+                        row = row + 1;
+                    parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
+                    }, time + 100);
+                    row = row - 1;
+                    if(row < 0){
+                        console.log("Cannot move more up!!!");
+                    }
+                    console.log(row);
+                    return animateGrid(row, column, time + 100, direction, steps);
+                }
+                else if(direction == 1){
+                    setTimeout(function(){
+                    parentDiv.rows[row].cells[--column].style.backgroundColor = "purple";
+                    }, time + 100);
+                    return animateGrid(row, ++column, time + 100, direction, steps);
+                }
+                else if(direction == 2){
                     setTimeout(function(){
                     parentDiv.rows[--row].cells[column].style.backgroundColor = "purple";
                     }, time + 100);
-                    return animateGrid(++row, ++column, time + 100, diag, steps);
+                    return animateGrid(++row, ++column, time + 100, direction, steps);
                 }
                 else{
                     setTimeout(function(){
                     parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
                     }, time + 100);
-                    return animateGrid(row, ++column, time + 100, diag, steps);
+                    return animateGrid(row, ++column, time + 100, direction, steps);
                 }
             }
         }
 
         // 4th parameter: true for diagaonal, false for straight
-        animateGrid(0,-1, 0, true, 3);
+        animateGrid(0,0, 0, 1, 3);
+        //animateGrid(0,-1, 0, false, 5);
         // Makes sure with the mouse is up, stop drawing.
         parentDiv.onmouseup = function(){
             mousedown = false;
