@@ -161,10 +161,11 @@ var createGrid = function(grdSize) {
                 } else {
                     setTimeout(function() {
                         parentDiv.rows[row].cells[column].style.backgroundColor = "purple";
+                        setTimeout(function() {parentDiv.rows[row].cells[column].style.backgroundColor = "white";}, 280);
                         zombie.row = row;
                         zombie.column = column;
                         console.log(zombie);
-                    }, time + 100);
+                    }, time + 100); // 100 here is initial delay before any animation, not speed of animation bet. frames.
 
                     /* Btw, if direction is negative, direction % 8 returns negatuve.
                      * This is because it is accepted for C programmers, back then.
@@ -179,34 +180,36 @@ var createGrid = function(grdSize) {
 
                      * For now, I will allow any >= 0 number for direction
                      * since my modulus will calculate the case number.
+
+                     * Maybe iterative is more efficient.....
                     */
                     switch (direction % 8) {
                         case 0:
-                            return animateGrid(row - 1, column, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row - 1, column, time + 300, direction, steps, ++cursteps);
                             break;
                         case 1:
                             if (column + 1 > parentDiv.rows[row].cells.length)
                                 console.log("Cannot move more right!!!");
                             else
-                                return animateGrid(row - 1, column + 1, time + 100, direction, steps, ++cursteps);
+                                return animateGrid(row - 1, column + 1, time + 300, direction, steps, ++cursteps);
                             break;
                         case 2:
-                            return animateGrid(row, column + 1, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row, column + 1, time + 300, direction, steps, ++cursteps);
                             break;
                         case 3:
-                            return animateGrid(row + 1, column + 1, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row + 1, column + 1, time + 300, direction, steps, ++cursteps);
                             break;
                         case 4:
-                            return animateGrid(row + 1, column, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row + 1, column, time + 300, direction, steps, ++cursteps);
                             break;
                         case 5:
-                            return animateGrid(row + 1, column - 1, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row + 1, column - 1, time + 300, direction, steps, ++cursteps);
                             break;
                         case 6:
-                            return animateGrid(row, column - 1, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row, column - 1, time + 300, direction, steps, ++cursteps);
                             break;
                         case 7:
-                            return animateGrid(row - 1, column - 1, time + 100, direction, steps, ++cursteps);
+                            return animateGrid(row - 1, column - 1, time + 300, direction, steps, ++cursteps);
                             break;
                         default:
                             console.log("Invalid Direction!");
@@ -237,14 +240,19 @@ var createGrid = function(grdSize) {
             }
 
             // 4th parameter 0 1 2 3 (up, left, right, down)
-            zombie.row = 2;
-            zombie.column = 2;
-            var test = animateGrid(zombie.row, zombie.column, 0, 2, 4, 0);
+            zombie.row = 3;
+            zombie.column = 3;
+            //var test = animateGrid(zombie.row, zombie.column, 0, 2, 4, 0);
             //console.log(test);
-            /*
-            for(var i = 0; i < 4; i++){
-                animateGrid(zombie.row, zombie.column, 0, i, 3, 0);
+            
+            for(var i = 0; i < 8; i++){
+                console.log(animateGrid(zombie.row, zombie.column, 0, i, grdsz-1, 0));
             }
+
+            /* Animate zombies by using a while loop kinda like
+             * while (zombie.health !== 0){
+                  animateGrid(...); // Recursive call eachtime with some path to animate
+               }
             */
             // Makes sure with the mouse is up, stop drawing.
             parentDiv.onmouseup = function() {
