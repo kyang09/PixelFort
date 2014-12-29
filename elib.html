@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>elib test</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <script type="text/javascript" src="elib.js"></script>
+    <script type="text/javascript">
+        var display = document.createElement("div");
+        
+        document.body.appendChild(display);
+        
+        function RenderComponent(name)
+        {
+            this.name = name;
+        }
+        
+        function PositionComponent(x, y, dx, dy)
+        {
+            this.x = x;
+            this.y = y;
+            this.dx = dx;
+            this.dy = dy;
+        }
+        
+        function system_reset(world)
+        {
+            display.innerHTML = "";
+        }
+        
+        function system_render(world)
+        {
+            var ents = world.get_entities(RenderComponent, PositionComponent);
+            
+            for(var index in ents)
+            {
+                var ent = ents[index];
+                var render = ent.get(RenderComponent);
+                var pos = ent.get(PositionComponent);
+                display.innerHTML += "entity " + render.name + " is at " + pos.x + ", " + pos.y + "<br />";
+            }
+        }
+        
+        function system_move(world)
+        {
+            var ents = world.get_entities(PositionComponent);
+            
+            for(var index in ents)
+            {
+                var ent = ents[index];
+                var pos = ent.get(PositionComponent);
+                pos.x += pos.dx;
+                pos.y += pos.dy;
+            }
+        }
+        
+        var world = new elib.World();
+        
+        world.register_system(system_reset);
+        world.register_system(system_render);
+        world.register_system(system_move);
+        world.create_entity(
+            new RenderComponent("first"),
+            new PositionComponent(100, 200, 1, 2)
+        );
+        world.create_entity(
+            new RenderComponent("second"),
+            new PositionComponent(100, 200, -1, -2)
+        );
+        
+        function loop()
+        {
+            world.update();
+            setTimeout(loop, 500);
+        }
+        
+        loop();
+    </script>
+</body>
+</html>
