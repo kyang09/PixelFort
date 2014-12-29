@@ -29,37 +29,25 @@
             display.innerHTML = "";
         }
         
-        function system_render(world)
+        function system_render(world, entity)
         {
-            var ents = world.get_entities(RenderComponent, PositionComponent);
-            
-            for(var index in ents)
-            {
-                var ent = ents[index];
-                var render = ent.get(RenderComponent);
-                var pos = ent.get(PositionComponent);
-                display.innerHTML += "entity " + render.name + " is at " + pos.x + ", " + pos.y + "<br />";
-            }
+            var render = entity.get(RenderComponent);
+            var pos = entity.get(PositionComponent);
+            display.innerHTML += "entity " + render.name + " is at " + pos.x + ", " + pos.y + "<br />";
         }
         
-        function system_move(world)
+        function system_move(world, entity)
         {
-            var ents = world.get_entities(PositionComponent);
-            
-            for(var index in ents)
-            {
-                var ent = ents[index];
-                var pos = ent.get(PositionComponent);
-                pos.x += pos.dx;
-                pos.y += pos.dy;
-            }
+            var pos = entity.get(PositionComponent);
+            pos.x += pos.dx;
+            pos.y += pos.dy;
         }
         
         var world = new elib.World();
         
         world.register_system(system_reset);
-        world.register_system(system_render);
-        world.register_system(system_move);
+        world.register_simple_system(system_render, RenderComponent, PositionComponent);
+        world.register_simple_system(system_move, PositionComponent);
         world.create_entity(
             new RenderComponent("first"),
             new PositionComponent(100, 200, 1, 2)

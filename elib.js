@@ -2,8 +2,6 @@ var elib = (function()
 {
     var module = {};
     
-    console.log("elib init");
-    
     function assert(condition, message)
     {
         if(!condition)
@@ -79,6 +77,30 @@ var elib = (function()
     {
         this.systems.push(func);
     };
+    module.World.prototype.register_simple_system = function()
+    {
+        if(arguments.length < 2)
+            throw new Error("register_simple_system requires a function and at least one component type");
+        
+        var func;
+        var componentTypes = [];
+        
+        for(var index in arguments)
+            if(index == 0)
+                func = arguments[index];
+            else
+                componentTypes.push(arguments[index]);
+        
+        this.systems.push(
+            function(world)
+            {
+                var ents = module.World.prototype.get_entities.apply(world, componentTypes);
+                
+                for(var index in ents)
+                    func(world, ents[index]);
+            }
+        );
+    };
     module.World.prototype.get_entities = function()
     {
         var result = [];
@@ -103,6 +125,15 @@ var elib = (function()
         this.entities.push(ent);
         
         return ent;
+    };
+    module.World.prototype.destroy_entity = function(entity)
+    {
+        var index = this.entities.indexOf(entity);
+        
+        if(index == -1)
+            throw new Error("Entity does not exist in this world");
+        
+        this.entities.pop(index);
     };
     module.World.prototype.update = function()
     {
@@ -138,16 +169,28 @@ var elib = (function()
         {
             var ents = world.get_entities(ComponentA);
             
-            assert(ents[0] === entA);
-            assert(ents[1] === entC);
+            assert(ents[0] === entA, "component A first");
+            assert(ents[1] === entC, "component A second");
             
             ents = world.get_entities(ComponentB);
             
-            assert(ents[0] === entB);
-            assert(ents[1] === entC);
+            assert(ents[0] === entB, "component B first");
+            assert(ents[1] === entC, "component B second");
         }
         
         world.register_system(system_test);
+        world.update();
+        world.destroy_entity(entC);
+        
+        world.systems = []
+        
+        world.register_simple_system(
+            function(world, entity)
+            {
+                assert(entity.has(ComponentA) && !entity.has(ComponentB), "simple system");
+            },
+            ComponentA
+        );
         world.update();
     }());
     
